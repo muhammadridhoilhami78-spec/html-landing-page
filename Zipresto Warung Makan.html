@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Zipresto Warung Makan</title>
+<meta name="description" content="Zipresto, warung makan masakan rumahan. Susun piringmu sendiri dari etalase lauk, lihat nota langsung, lalu pesan lewat WhatsApp.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Hanken+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/*
+  Konsep: warung dengan tegel hijau tosca, etalase kaca, dan nota tulis.
+  Layout: judul besar rata kiri, lalu etalase (pilihan) di kiri dan nota (hasil) di kanan.
+  Satu momen berani: etalase interaktif yang mengisi piring dan nota secara langsung.
+*/
+:root {
+  --tegel: #0F5C55;
+  --tegel-gelap: #0A3F3B;
+  --kapur: #E8F0E9;
+  --cabai: #C8262B;
+  --kunyit: #F2B705;
+  --arang: #16201E;
+
+  --kapur-2: #D2E1D6;
+  --kertas: #FBFCFA;
+  --teks-redup: #3A4644;
+  --buka: #1F8A4C;
+
+  --font-display: 'Dela Gothic One', 'Arial Black', system-ui, sans-serif;
+  --font-body: 'Hanken Grotesk', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  --t-kecil: 0.875rem;
+  --t-dasar: 1.0625rem;
+  --t-besar: 1.25rem;
+  --t-h2: clamp(1.7rem, 3.6vw, 2.5rem);
+
+  color-scheme: light;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--kapur);
+  color: var(--arang);
+  font-family: var(--font-body);
+  font-size: var(--t-dasar);
+  line-height: 1.55;
+}
+h1, h2, h3, p, ul, ol, fieldset, figure { margin: 0; padding: 0; }
+ul, ol { list-style: none; }
+img, svg { max-width: 100%; display: block; }
+a { color: inherit; }
+
+:focus-visible { outline: 3px solid var(--arang); outline-offset: 3px; }
+.gelap :focus-visible, .etalase :focus-visible { outline-color: var(--kunyit); }
+
+.wrap { max-width: 1160px; margin-inline: auto; padding-inline: clamp(16px, 4vw, 32px); }
+.blok { padding-block: clamp(40px, 7vw, 72px); }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+h2.judul {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: var(--t-h2);
+  line-height: 1.12;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+.pengantar { max-width: 58ch; margin-top: 10px; font-size: var(--t-besar); line-height: 1.5; }
+
+/* tombol */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 0.8rem 1.25rem; border-radius: 12px; border: 2px solid transparent;
+  font: 700 1rem/1.2 var(--font-body); text-decoration: none; cursor: pointer;
+  transition: background-color .15s, color .15s;
+}
+.btn-cabai { background: var(--cabai); color: #fff; border-color: var(--cabai); }
+.btn-cabai:hover { background: #A81D22; border-color: #A81D22; }
+.btn-garis { background: transparent; color: var(--arang); border-color: var(--arang); }
+.btn-garis:hover { background: var(--arang); color: var(--kapur); }
+.gelap .btn-garis, .btn-garis.terang { color: var(--kapur); border-color: var(--kapur); }
+.gelap .btn-garis:hover, .btn-garis.terang:hover { background: var(--kapur); color: var(--arang); }
+.btn-kecil { padding: 0.5rem 0.9rem; font-size: var(--t-kecil); border-radius: 10px; }
+
+/* header */
+.kepala { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 18px; }
+.merek { font-family: var(--font-display); font-size: 1.35rem; text-decoration: none; color: var(--tegel); letter-spacing: -0.01em; }
+.kepala nav { display: flex; gap: 22px; margin-left: auto; }
+.kepala nav a { font-weight: 500; text-decoration: none; padding-block: 6px; border-bottom: 2px solid transparent; }
+.kepala nav a:hover { border-bottom-color: var(--cabai); }
+
+/* hero */
+.hero { padding-block: clamp(16px, 4vw, 36px) clamp(20px, 3vw, 32px); }
+.wordmark {
+  font-family: var(--font-display); font-weight: 400;
+  font-size: clamp(3rem, 14vw, 9rem); line-height: 0.95; letter-spacing: -0.03em;
+  color: var(--tegel);
+}
+.hero-grid { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: clamp(20px, 4vw, 56px); margin-top: clamp(18px, 3vw, 32px); align-items: start; }
+.lead { font-size: clamp(1.2rem, 2.2vw, 1.5rem); line-height: 1.45; max-width: 36ch; }
+.cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 22px; }
+.hero-info { display: grid; gap: 12px; justify-items: start; }
+.status {
+  display: inline-flex; align-items: center; gap: 10px; padding: 0.45rem 0.85rem;
+  border: 2px solid var(--arang); border-radius: 999px; font-weight: 700; font-size: 0.95rem; background: var(--kertas);
+}
+.lampu { width: 10px; height: 10px; border-radius: 50%; background: var(--buka); flex: none; }
+.status.tutup .lampu { background: var(--cabai); }
+.alamat { font-size: var(--t-besar); line-height: 1.4; }
+.tautan { font-weight: 700; text-underline-offset: 4px; }
+
+/* ritsleting: pemisah merek (Zip) */
+/* --p: 0 = tertutup, 1 = terbuka penuh. Bagian kiri tab terbuka, bagian kanan masih tertutup. */
+.zip { --p: 0; position: relative; height: 40px; margin-block: 4px 0; touch-action: pan-y; }
+.zip-lapis { position: absolute; inset: 0; }
+.zip-lapis::before, .zip-lapis::after {
+  content: ""; position: absolute; left: 0; right: 0; height: 8px;
+  background: repeating-linear-gradient(90deg, var(--arang) 0 7px, transparent 7px 14px);
+}
+.zip-tutup { clip-path: inset(0 0 0 calc(var(--p) * (100% - 52px) + 26px)); }
+.zip-tutup::before { top: 15px; }
+.zip-tutup::after { top: 19px; background-position: 7px 0; }
+.zip-buka { clip-path: inset(0 calc(100% - var(--p) * (100% - 52px) - 26px) 0 0); }
+.zip-buka::before { top: 3px; }
+.zip-buka::after { top: 29px; background-position: 7px 0; }
+.zip-tab {
+  position: absolute; top: 50%; left: calc(var(--p) * (100% - 52px)); translate: 0 -50%;
+  width: 52px; height: 32px; padding: 0; border: 0; border-radius: 9px; background: var(--cabai);
+  cursor: grab; touch-action: none;
+}
+.zip-tab:active { cursor: grabbing; }
+.zip-tab::after { content: ""; position: absolute; right: 8px; top: 50%; translate: 0 -50%; width: 11px; height: 11px; border-radius: 50%; background: var(--kapur); }
+
+/* penyusun piring */
+.susun-grid { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.9fr); gap: clamp(20px, 3.5vw, 40px); align-items: start; margin-top: 28px; }
+.etalase { background: var(--tegel); color: var(--kapur); border-radius: 20px; padding: clamp(18px, 3vw, 32px); }
+.etalase fieldset { border: 0; min-inline-size: 0; margin-bottom: 28px; }
+.etalase fieldset:last-of-type { margin-bottom: 0; }
+.etalase legend { display: flex; align-items: center; gap: 10px; font-family: var(--font-display); font-size: 1.15rem; margin-bottom: 12px; padding: 0; }
+.no { display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: var(--kunyit); color: var(--arang); font: 700 0.9rem/1 var(--font-body); }
+
+.pilihan { display: flex; flex-wrap: wrap; gap: 8px; }
+.pill, .tile { position: relative; display: block; cursor: pointer; }
+.pill input, .tile input { position: absolute; opacity: 0; width: 1px; height: 1px; margin: 0; }
+.pill span {
+  display: inline-flex; align-items: baseline; gap: 8px; padding: 0.5rem 0.95rem; border-radius: 999px;
+  border: 2px solid rgba(232, 240, 233, 0.55); font-weight: 500; transition: background-color .12s, color .12s;
+}
+.pill small { font-size: var(--t-kecil); opacity: 0.9; }
+.pill:hover span { border-color: var(--kapur); }
+.pill input:checked + span { background: var(--kunyit); border-color: var(--kunyit); color: var(--arang); font-weight: 700; }
+.pill input:focus-visible + span, .tile input:focus-visible + .tile-isi { outline: 3px solid var(--kunyit); outline-offset: 3px; }
+
+.rak { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+.tile-isi {
+  position: relative; display: grid; align-content: start; gap: 4px; min-height: 104px; padding: 12px 14px;
+  background: var(--kapur); color: var(--arang); border: 3px solid transparent; border-radius: 14px;
+  transition: background-color .12s, transform .12s;
+}
+.tile:hover .tile-isi { transform: translateY(-2px); }
+.tile-isi::after {
+  content: ""; position: absolute; top: 10px; right: 10px; width: 20px; height: 20px; border-radius: 50%;
+  border: 2px solid var(--arang); display: grid; place-items: center; font-size: 12px; font-weight: 700; line-height: 1;
+}
+.tile input:checked + .tile-isi { background: var(--kunyit); border-color: var(--arang); }
+.tile input:checked + .tile-isi::after { content: "\2713"; background: var(--arang); color: var(--kunyit); }
+.titik { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--arang); margin-bottom: 6px; }
+.tile-nama { font-weight: 700; line-height: 1.25; padding-right: 8px; }
+.tile-harga { color: var(--teks-redup); font-size: var(--t-kecil); font-variant-numeric: tabular-nums; }
+
+.isian { display: grid; gap: 6px; margin-top: 16px; }
+.isian label { font-weight: 500; }
+.isian input {
+  font: inherit; color: var(--arang); background: var(--kapur); border: 3px solid transparent; border-radius: 10px;
+  padding: 0.6rem 0.8rem; width: 100%; max-width: 360px;
+}
+
+/* nota */
+.nota-wrap { position: relative; }
+.nota { position: relative; background: var(--kertas); padding: 24px 22px 26px; border-radius: 8px 8px 0 0; box-shadow: 0 16px 28px -20px rgba(10, 63, 59, 0.7); }
+.nota::after {
+  content: ""; position: absolute; left: 0; right: 0; top: 100%; height: 8px;
+  background: linear-gradient(135deg, var(--kertas) 25%, transparent 25%) -8px 0, linear-gradient(225deg, var(--kertas) 25%, transparent 25%) -8px 0;
+  background-size: 16px 16px;
+}
+.nota-kepala { display: flex; align-items: center; gap: 16px; }
+.piring { width: 132px; flex: none; }
+.nota h3 { font-family: var(--font-display); font-weight: 400; font-size: 1.4rem; line-height: 1.15; }
+.meta { color: var(--teks-redup); margin-top: 4px; overflow-wrap: anywhere; }
+.baris { margin-top: 18px; border-top: 2px dashed var(--arang); padding-top: 8px; }
+.baris li { display: flex; justify-content: space-between; gap: 16px; padding: 6px 0; border-bottom: 1px dotted rgba(22, 32, 30, 0.35); }
+.baris .hrg { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.baris .kosong { color: var(--teks-redup); font-style: italic; }
+.jumlah { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; margin-top: 14px; }
+.jumlah span:first-child { font-weight: 700; }
+.jumlah .total { font-family: var(--font-display); font-size: 1.7rem; color: var(--cabai); font-variant-numeric: tabular-nums; }
+.aksi { display: grid; gap: 10px; margin-top: 20px; }
+.pesan-info { min-height: 1.5em; margin-top: 10px; font-size: var(--t-kecil); color: var(--teks-redup); }
+
+.pop { transform-box: fill-box; transform-origin: center; animation: pop .45s cubic-bezier(.3, 1.5, .5, 1) backwards; }
+@keyframes pop { from { transform: scale(0.6); } }
+
+/* papan menu */
+.gelap { background: var(--tegel-gelap); color: var(--kapur); }
+.papan { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 clamp(24px, 5vw, 64px); margin-top: 28px; }
+.papan li { padding-block: 20px; border-top: 1px solid rgba(232, 240, 233, 0.3); display: grid; gap: 10px; align-content: start; }
+.papan-atas { display: flex; align-items: baseline; gap: 10px; }
+.papan h3 { font-family: var(--font-display); font-weight: 400; font-size: 1.25rem; line-height: 1.2; }
+.titik-titik { flex: 1; min-width: 16px; border-bottom: 3px dotted rgba(232, 240, 233, 0.5); translate: 0 -4px; }
+.papan .harga { font-weight: 700; font-size: var(--t-besar); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.papan p { max-width: 50ch; }
+.papan .btn { justify-self: start; }
+
+/* info */
+.info-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(24px, 5vw, 64px); margin-top: 28px; align-items: start; }
+.info-grid h3 { font-family: var(--font-display); font-weight: 400; font-size: 1.25rem; margin-bottom: 10px; }
+table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; padding: 10px 0; border-bottom: 1px solid rgba(22, 32, 30, 0.25); font-weight: 400; }
+td:last-child { text-align: right; }
+tr.hari-ini th, tr.hari-ini td { font-weight: 700; }
+.badge { display: inline-block; margin-left: 8px; padding: 1px 8px; border-radius: 999px; background: var(--kunyit); font-size: 0.8rem; font-weight: 700; }
+.lokasi p + p { margin-top: 6px; }
+.besar { background: var(--kapur-2); border-radius: 16px; padding: clamp(20px, 3vw, 30px); }
+.besar p { margin-bottom: 18px; max-width: 46ch; }
+
+/* kaki */
+.kaki { background: var(--arang); color: var(--kapur); padding-block: 36px; }
+.kaki-grid { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 20px 40px; }
+.kaki .merek { color: var(--kapur); }
+.kaki p { max-width: 40ch; }
+
+@media (max-width: 899px) {
+  .hero-grid, .susun-grid, .info-grid { grid-template-columns: minmax(0, 1fr); }
+  .papan { grid-template-columns: minmax(0, 1fr); }
+  .papan li:first-child { border-top: 0; }
+}
+@media (min-width: 900px) {
+  .nota-wrap { position: sticky; top: 16px; }
+  .papan li:nth-child(-n+2) { border-top: 0; }
+}
+@media (max-width: 699px) {
+  .kepala nav { display: none; }
+  .kepala .btn { margin-left: auto; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pop { animation: none; }
+  .tile:hover .tile-isi { transform: none; }
+  * { transition-duration: 0s !important; }
+}
+</style>
+</head>
+<body>
+
+<header class="wrap kepala">
+  <a class="merek" href="#atas">Zipresto</a>
+  <nav aria-label="Menu utama">
+    <a href="#susun">Susun piring</a>
+    <a href="#paket">Paket</a>
+    <a href="#info">Jam dan lokasi</a>
+  </nav>
+  <a class="btn btn-garis btn-kecil" href="https://wa.me/" data-wa="Halo Zipresto, saya mau tanya.">Chat WhatsApp</a>
+</header>
+
+<main id="atas">
+  <section class="wrap hero" aria-labelledby="judul-utama">
+    <h1 class="wordmark" id="judul-utama">Zipresto</h1>
+    <div class="hero-grid">
+      <div>
+        <p class="lead">Warung makan masakan rumahan. Pilih nasi, lauk, dan sambalmu sendiri, kami siapkan cepat.</p>
+        <div class="cta">
+          <a class="btn btn-cabai" href="#susun">Susun piringmu</a>
+          <a class="btn btn-garis" href="#paket">Lihat paket</a>
+        </div>
+      </div>
+      <div class="hero-info">
+        <p class="status" id="status"><span class="lampu" aria-hidden="true"></span><span id="status-teks">Buka setiap hari</span></p>
+        <p class="alamat">Jl. Raya Contoh No. 12<br>Kota Anda</p>
+        <a class="tautan" href="#info">Jam buka dan lokasi</a>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap">
+    <div class="zip" id="zip">
+      <div class="zip-lapis zip-tutup" aria-hidden="true"></div>
+      <div class="zip-lapis zip-buka" aria-hidden="true"></div>
+      <button type="button" class="zip-tab" id="zip-tab" aria-label="Buka atau tutup ritsleting. Geser, atau tekan panah kiri dan kanan."></button>
+    </div>
+  </div>
+
+  <section class="wrap blok" id="susun" aria-labelledby="judul-susun" style="scroll-margin-top:12px">
+    <h2 class="judul" id="judul-susun">Susun piringmu</h2>
+    <p class="pengantar">Pilih dari etalase. Gambar piring dan nota ikut berubah setiap kali kamu memilih, harganya langsung terhitung.</p>
+    <noscript><p class="pengantar">Aktifkan JavaScript untuk menyusun piring, atau pesan langsung lewat WhatsApp.</p></noscript>
+
+    <div class="susun-grid">
+      <form class="etalase" id="form" autocomplete="off">
+        <fieldset id="g-nasi"><legend><span class="no" aria-hidden="true">1</span>Nasi</legend><div class="pilihan" id="o-nasi"></div></fieldset>
+        <fieldset id="g-lauk"><legend><span class="no" aria-hidden="true">2</span>Lauk, boleh lebih dari satu</legend><div class="rak" id="o-lauk"></div></fieldset>
+        <fieldset id="g-sambal"><legend><span class="no" aria-hidden="true">3</span>Sambal, gratis</legend><div class="pilihan" id="o-sambal"></div></fieldset>
+        <fieldset id="g-minum"><legend><span class="no" aria-hidden="true">4</span>Minum</legend><div class="pilihan" id="o-minum"></div></fieldset>
+        <fieldset id="g-tempat"><legend><span class="no" aria-hidden="true">5</span>Makan di mana</legend>
+          <div class="pilihan" id="o-tempat"></div>
+          <div class="isian">
+            <label for="nama">Nama pemesan</label>
+            <input type="text" id="nama" name="nama" placeholder="Nama kamu" maxlength="40">
+          </div>
+        </fieldset>
+      </form>
+
+      <div class="nota-wrap">
+        <article class="nota" aria-labelledby="judul-nota">
+          <div class="nota-kepala">
+            <svg class="piring" id="piring" viewBox="0 0 200 200" role="img" aria-label="Piring kosong"></svg>
+            <div>
+              <h3 id="judul-nota">Nota pesananmu</h3>
+              <p class="meta" id="meta"></p>
+            </div>
+          </div>
+          <ul class="baris" id="baris"></ul>
+          <p class="jumlah"><span>Total</span><span class="total" id="total" aria-live="polite">Rp 0</span></p>
+          <div class="aksi">
+            <a class="btn btn-cabai" id="wa-pesan" href="https://wa.me/">Pesan lewat WhatsApp</a>
+            <button class="btn btn-garis" type="button" id="salin">Salin pesanan</button>
+          </div>
+          <p class="pesan-info" id="pesan-info" role="status"></p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="gelap blok" id="paket" aria-labelledby="judul-paket" style="scroll-margin-top:0">
+    <div class="wrap">
+      <h2 class="judul" id="judul-paket">Paket siap pilih</h2>
+      <p class="pengantar">Mulai dari satu paket, lalu ganti lauknya di nota kalau kamu mau.</p>
+      <ul class="papan" id="papan"></ul>
+    </div>
+  </section>
+
+  <section class="wrap blok" id="info" aria-labelledby="judul-info" style="scroll-margin-top:0">
+    <h2 class="judul" id="judul-info">Jam buka dan lokasi</h2>
+    <div class="info-grid">
+      <div>
+        <h3>Jam buka (WIB)</h3>
+        <table>
+          <tbody>
+            <tr data-hari="1,2,3,4,5,6"><th scope="row">Senin sampai Sabtu</th><td>07.00 sampai 21.00</td></tr>
+            <tr data-hari="0"><th scope="row">Minggu</th><td>08.00 sampai 20.00</td></tr>
+          </tbody>
+        </table>
+        <div class="lokasi" style="margin-top:24px">
+          <h3>Alamat</h3>
+          <p>Jl. Raya Contoh No. 12, Kota Anda</p>
+          <p>WhatsApp <span data-wa-teks></span></p>
+        </div>
+      </div>
+      <div class="besar">
+        <h3>Pesan nasi kotak</h3>
+        <p>Untuk kantor, rapat, atau acara keluarga. Kirim jumlah dan tanggal lewat WhatsApp, kami balas dengan harga dan jadwal.</p>
+        <a class="btn btn-cabai" href="https://wa.me/" data-wa="Halo Zipresto, saya mau tanya pesanan nasi kotak. Jumlah: ... kotak. Tanggal: ...">Tanya pesanan besar</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="kaki">
+  <div class="wrap kaki-grid">
+    <div>
+      <a class="merek" href="#atas">Zipresto</a>
+      <p>Warung makan masakan rumahan. Jl. Raya Contoh No. 12, Kota Anda.</p>
+    </div>
+    <p>&copy; 2026 Zipresto</p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  'use strict';
+
+  /* Ganti nomor WhatsApp warung di sini (format internasional, tanpa + dan spasi). */
+  var WA_NUMBER = '6281234567890';
+
+  /* Jam buka per hari (0 = Minggu), jam WIB. */
+  var JAM = { 0: [8, 20], 1: [7, 21], 2: [7, 21], 3: [7, 21], 4: [7, 21], 5: [7, 21], 6: [7, 21] };
+
+  var NASI = [
+    { id: 'putih', nama: 'Nasi putih', harga: 5000, warna: '#FBFBF4', butir: '#FFFFFF' },
+    { id: 'uduk', nama: 'Nasi uduk', harga: 7000, warna: '#F1E4AE', butir: '#FBF3D0' }
+  ];
+  var LAUK = [
+    { id: 'ayam', nama: 'Ayam goreng kremes', harga: 14000, warna: '#C9822B' },
+    { id: 'lele', nama: 'Lele goreng', harga: 12000, warna: '#9A6422' },
+    { id: 'rendang', nama: 'Rendang daging', harga: 18000, warna: '#5C2A1E' },
+    { id: 'telur', nama: 'Telur balado', harga: 6000, warna: '#D6402B' },
+    { id: 'terong', nama: 'Terong balado', harga: 6000, warna: '#7B2E5E' },
+    { id: 'tempe', nama: 'Tempe orek', harga: 5000, warna: '#6B4426' },
+    { id: 'tahu', nama: 'Tahu bacem', harga: 4000, warna: '#8A5A2B' },
+    { id: 'urap', nama: 'Urap sayur', harga: 4000, warna: '#5E9B3E' }
+  ];
+  var SAMBAL = [
+    { id: 'terasi', nama: 'Sambal terasi', warna: '#8E2A1E' },
+    { id: 'matah', nama: 'Sambal matah', warna: '#E36A2E' },
+    { id: 'ijo', nama: 'Sambal ijo', warna: '#4E8F3A' },
+    { id: 'none', nama: 'Tanpa sambal', warna: null }
+  ];
+  var MINUM = [
+    { id: 'none', nama: 'Tanpa minum', harga: 0 },
+    { id: 'esteh', nama: 'Es teh manis', harga: 4000 },
+    { id: 'tehhangat', nama: 'Teh hangat', harga: 3000 },
+    { id: 'esjeruk', nama: 'Es jeruk', harga: 6000 }
+  ];
+  var TEMPAT = [
+    { id: 'sini', nama: 'Makan di sini' },
+    { id: 'bungkus', nama: 'Bungkus' }
+  ];
+  var PAKET = [
+    { nama: 'Paket ayam kremes', nasi: 'putih', lauk: ['ayam', 'tempe'], sambal: 'terasi', minum: 'esteh' },
+    { nama: 'Paket lele', nasi: 'putih', lauk: ['lele', 'tahu', 'urap'], sambal: 'ijo', minum: 'esteh' },
+    { nama: 'Paket rendang', nasi: 'uduk', lauk: ['rendang', 'urap'], sambal: 'ijo', minum: 'esjeruk' },
+    { nama: 'Paket hemat', nasi: 'putih', lauk: ['tempe', 'tahu', 'urap'], sambal: 'matah', minum: 'tehhangat' }
+  ];
+
+  var SLOT = [[136, 64], [148, 108], [114, 148], [66, 150], [44, 122], [152, 146]];
+  var ROT = [-12, 18, -20, 10, -8, 22];
+
+  var form = document.getElementById('form');
+  var piring = document.getElementById('piring');
+  var baris = document.getElementById('baris');
+  var totalEl = document.getElementById('total');
+  var metaEl = document.getElementById('meta');
+  var infoEl = document.getElementById('pesan-info');
+  var waPesan = document.getElementById('wa-pesan');
+  var salinBtn = document.getElementById('salin');
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  var shown = {};
+  var teksPesanan = '';
+
+  function rp(n) { return 'Rp ' + String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '.'); }
+  function byId(list, id) { for (var i = 0; i < list.length; i++) { if (list[i].id === id) return list[i]; } return list[0]; }
+
+  /* ---------- kontrol ---------- */
+  function pill(name, o, checked, withPrice) {
+    var harga = withPrice && o.harga ? ' <small>' + rp(o.harga) + '</small>' : '';
+    return '<label class="pill"><input type="radio" id="' + name + '-' + o.id + '" name="' + name + '" value="' + o.id + '"' + (checked ? ' checked' : '') + '><span>' + o.nama + harga + '</span></label>';
+  }
+  function tile(o, checked) {
+    return '<label class="tile"><input type="checkbox" id="lauk-' + o.id + '" name="lauk" value="' + o.id + '"' + (checked ? ' checked' : '') + '>' +
+      '<span class="tile-isi"><i class="titik" style="background:' + o.warna + '"></i><span class="tile-nama">' + o.nama + '</span><span class="tile-harga">' + rp(o.harga) + '</span></span></label>';
+  }
+  document.getElementById('o-nasi').innerHTML = NASI.map(function (o, i) { return pill('nasi', o, i === 0, true); }).join('');
+  document.getElementById('o-lauk').innerHTML = LAUK.map(function (o) { return tile(o, o.id === 'ayam' || o.id === 'tempe'); }).join('');
+  document.getElementById('o-sambal').innerHTML = SAMBAL.map(function (o, i) { return pill('sambal', o, i === 0, false); }).join('');
+  document.getElementById('o-minum').innerHTML = MINUM.map(function (o) { return pill('minum', o, o.id === 'esteh', true); }).join('');
+  document.getElementById('o-tempat').innerHTML = TEMPAT.map(function (o, i) { return pill('tempat', o, i === 0, false); }).join('');
+
+  /* ---------- keadaan ---------- */
+  function baca() {
+    var f = form.elements;
+    return {
+      nasi: f.nasi.value,
+      sambal: f.sambal.value,
+      minum: f.minum.value,
+      tempat: f.tempat.value,
+      nama: f.nama.value.trim(),
+      lauk: LAUK.filter(function (l) { return form.querySelector('input[name="lauk"][value="' + l.id + '"]').checked; }).map(function (l) { return l.id; })
+    };
+  }
+
+  function daftar(s) {
+    var rows = [];
+    var n = byId(NASI, s.nasi);
+    rows.push({ nama: n.nama, harga: n.harga });
+    s.lauk.forEach(function (id) { var l = byId(LAUK, id); rows.push({ nama: l.nama, harga: l.harga }); });
+    if (s.sambal !== 'none') rows.push({ nama: byId(SAMBAL, s.sambal).nama, harga: 0 });
+    if (s.minum !== 'none') { var m = byId(MINUM, s.minum); rows.push({ nama: m.nama, harga: m.harga }); }
+    return rows;
+  }
+  function jumlah(rows) { return rows.reduce(function (a, r) { return a + r.harga; }, 0); }
+
+  /* ---------- piring ---------- */
+  function gambarPiring(s) {
+    var n = byId(NASI, s.nasi);
+    var out = '<circle cx="100" cy="100" r="94" fill="#fff" stroke="#0F5C55" stroke-width="4"/>' +
+      '<circle cx="100" cy="100" r="76" fill="none" stroke="#D2E1D6" stroke-width="3"/>';
+    out += '<circle cx="78" cy="88" r="32" fill="' + n.warna + '" stroke="#16201E" stroke-opacity=".3" stroke-width="2"/>';
+    for (var i = 0; i < 14; i++) {
+      var a = i * 2.4, r = Math.sqrt(i / 14) * 24;
+      out += '<ellipse cx="' + (78 + Math.cos(a) * r).toFixed(1) + '" cy="' + (88 + Math.sin(a) * r).toFixed(1) + '" rx="4.5" ry="2.4" fill="' + n.butir + '" stroke="#16201E" stroke-opacity=".18" transform="rotate(' + ((i * 37) % 180) + ' ' + (78 + Math.cos(a) * r).toFixed(1) + ' ' + (88 + Math.sin(a) * r).toFixed(1) + ')"/>';
+    }
+    var baru = {};
+    s.lauk.slice(0, SLOT.length).forEach(function (id, i) {
+      var l = byId(LAUK, id), x = SLOT[i][0], y = SLOT[i][1], rot = ROT[i];
+      var key = 'lauk-' + id;
+      baru[key] = true;
+      var pop = shown[key] ? '' : ' pop';
+      var delay = (!shown._init) ? ' style="animation-delay:' + (i * 90) + 'ms"' : '';
+      out += '<g class="blob' + pop + '"' + delay + '>' +
+        '<ellipse cx="' + x + '" cy="' + y + '" rx="19" ry="14" fill="' + l.warna + '" stroke="#16201E" stroke-opacity=".35" stroke-width="1.5" transform="rotate(' + rot + ' ' + x + ' ' + y + ')"/>' +
+        '<ellipse cx="' + (x - 5) + '" cy="' + (y - 5) + '" rx="7" ry="3.5" fill="#fff" fill-opacity=".3" transform="rotate(' + rot + ' ' + x + ' ' + y + ')"/></g>';
+    });
+    if (s.sambal !== 'none') {
+      var sb = byId(SAMBAL, s.sambal);
+      var skey = 'sambal-' + sb.id;
+      baru[skey] = true;
+      out += '<g class="' + (shown[skey] ? '' : 'pop') + '"><circle cx="118" cy="34" r="8" fill="' + sb.warna + '" stroke="#16201E" stroke-opacity=".4" stroke-width="1.5"/></g>';
+    }
+    shown = baru; shown._init = true;
+    piring.innerHTML = out;
+    var nama = [n.nama].concat(s.lauk.map(function (id) { return byId(LAUK, id).nama; }));
+    piring.setAttribute('aria-label', 'Piring berisi ' + nama.join(', '));
+  }
+
+  /* ---------- nota ---------- */
+  function pesan(s, rows) {
+    var t = ['Halo Zipresto, saya mau pesan:'];
+    rows.forEach(function (r) { t.push('- ' + r.nama + (r.harga ? ' (' + rp(r.harga) + ')' : ' (gratis)')); });
+    t.push('Total: ' + rp(jumlah(rows)));
+    t.push(byId(TEMPAT, s.tempat).nama);
+    if (s.nama) t.push('Atas nama: ' + s.nama);
+    return t.join('\n');
+  }
+
+  function render() {
+    var s = baca();
+    var rows = daftar(s);
+    var html = '';
+    function li(r) { return '<li><span>' + r.nama + '</span><span class="hrg">' + (r.harga ? rp(r.harga) : 'gratis') + '</span></li>'; }
+    html += li(rows[0]);
+    if (s.lauk.length === 0) html += '<li class="kosong"><span>Belum ada lauk. Pilih dari etalase.</span></li>';
+    rows.slice(1).forEach(function (r) { html += li(r); });
+    baris.innerHTML = html;
+    totalEl.textContent = rp(jumlah(rows));
+    metaEl.textContent = byId(TEMPAT, s.tempat).nama + (s.nama ? ', atas nama ' + s.nama : '');
+    gambarPiring(s);
+    teksPesanan = pesan(s, rows);
+    waPesan.href = 'https://wa.me/' + WA_NUMBER + '?text=' + encodeURIComponent(teksPesanan);
+  }
+
+  function terapkan(p) {
+    var f = form.elements;
+    f.nasi.value = p.nasi; f.sambal.value = p.sambal; f.minum.value = p.minum;
+    LAUK.forEach(function (l) { form.querySelector('input[name="lauk"][value="' + l.id + '"]').checked = p.lauk.indexOf(l.id) !== -1; });
+    render();
+  }
+
+  form.addEventListener('change', function () { infoEl.textContent = ''; render(); });
+  form.addEventListener('input', function (e) { if (e.target.id === 'nama') render(); });
+  form.addEventListener('submit', function (e) { e.preventDefault(); });
+
+  salinBtn.addEventListener('click', function () {
+    var p = navigator.clipboard && navigator.clipboard.writeText ? navigator.clipboard.writeText(teksPesanan) : Promise.reject();
+    p.then(function () { infoEl.textContent = 'Pesanan disalin.'; })
+     .catch(function () { infoEl.textContent = 'Tidak bisa menyalin di sini. Pakai tombol WhatsApp.'; });
+  });
+
+  /* ---------- paket ---------- */
+  document.getElementById('papan').innerHTML = PAKET.map(function (p, i) {
+    var rows = daftar({ nasi: p.nasi, lauk: p.lauk, sambal: p.sambal, minum: p.minum });
+    var isi = rows.map(function (r) { return r.nama.charAt(0).toLowerCase() + r.nama.slice(1); }).join(', ');
+    return '<li><div class="papan-atas"><h3>' + p.nama + '</h3><span class="titik-titik" aria-hidden="true"></span><span class="harga">' + rp(jumlah(rows)) + '</span></div>' +
+      '<p>' + isi.charAt(0).toUpperCase() + isi.slice(1) + '.</p>' +
+      '<button type="button" class="btn btn-garis btn-kecil terang" data-paket="' + i + '">Pakai di nota</button></li>';
+  }).join('');
+  document.getElementById('papan').addEventListener('click', function (e) {
+    var b = e.target.closest('button[data-paket]');
+    if (!b) return;
+    var p = PAKET[+b.getAttribute('data-paket')];
+    terapkan(p);
+    infoEl.textContent = p.nama + ' dipakai di nota.';
+    document.getElementById('susun').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+  });
+
+  /* ---------- WhatsApp umum ---------- */
+  Array.prototype.forEach.call(document.querySelectorAll('a[data-wa]'), function (a) {
+    a.href = 'https://wa.me/' + WA_NUMBER + '?text=' + encodeURIComponent(a.getAttribute('data-wa'));
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-wa-teks]'), function (el) { el.textContent = '+' + WA_NUMBER; });
+
+  /* ---------- status buka ---------- */
+  function sekarangWIB() {
+    var parts = new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Jakarta', weekday: 'short', hour: 'numeric', minute: 'numeric', hour12: false }).formatToParts(new Date());
+    function g(t) { for (var i = 0; i < parts.length; i++) { if (parts[i].type === t) return parts[i].value; } return '0'; }
+    var h = parseInt(g('hour'), 10); if (h === 24) h = 0;
+    return { hari: { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 }[g('weekday')], menit: h * 60 + parseInt(g('minute'), 10) };
+  }
+  function jam(h) { return (h < 10 ? '0' : '') + h + '.00 WIB'; }
+  try {
+    var now = sekarangWIB(), j = JAM[now.hari], teks, buka = false;
+    if (now.menit >= j[0] * 60 && now.menit < j[1] * 60) { buka = true; teks = 'Buka sekarang, tutup jam ' + jam(j[1]); }
+    else if (now.menit < j[0] * 60) { teks = 'Tutup sekarang, buka hari ini jam ' + jam(j[0]); }
+    else { teks = 'Tutup sekarang, buka besok jam ' + jam(JAM[(now.hari + 1) % 7][0]); }
+    document.getElementById('status-teks').textContent = teks;
+    document.getElementById('status').classList.toggle('tutup', !buka);
+    Array.prototype.forEach.call(document.querySelectorAll('tr[data-hari]'), function (tr) {
+      if (tr.getAttribute('data-hari').split(',').indexOf(String(now.hari)) !== -1) {
+        tr.classList.add('hari-ini');
+        tr.firstElementChild.insertAdjacentHTML('beforeend', '<span class="badge">hari ini</span>');
+      }
+    });
+  } catch (e) { /* biarkan teks bawaan */ }
+
+  /* ---------- ritsleting ---------- */
+  (function () {
+    var zip = document.getElementById('zip');
+    var tab = document.getElementById('zip-tab');
+    var p = 0, raf = 0, drag = null;
+
+    function set(v) { p = Math.max(0, Math.min(1, v)); zip.style.setProperty('--p', p.toFixed(4)); }
+    function ease(t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
+    function ke(target, ms) {
+      cancelAnimationFrame(raf);
+      if (reduce) { set(target); return; }
+      var from = p, t0 = null;
+      function step(t) {
+        if (t0 === null) t0 = t;
+        var k = Math.min(1, (t - t0) / ms);
+        set(from + (target - from) * ease(k));
+        if (k < 1) raf = requestAnimationFrame(step);
+      }
+      raf = requestAnimationFrame(step);
+    }
+
+    tab.addEventListener('pointerdown', function (e) {
+      cancelAnimationFrame(raf);
+      drag = { x0: e.clientX, p0: p, w: Math.max(1, zip.getBoundingClientRect().width - 52), moved: false };
+      tab.setPointerCapture(e.pointerId);
+    });
+    tab.addEventListener('pointermove', function (e) {
+      if (!drag) return;
+      var dx = e.clientX - drag.x0;
+      if (Math.abs(dx) > 4) drag.moved = true;
+      set(drag.p0 + dx / drag.w);
+    });
+    function lepas() {
+      if (!drag) return;
+      var d = drag; drag = null;
+      if (d.moved) ke(p > 0.5 ? 1 : 0, 300); else ke(p > 0.5 ? 0 : 1, 1200);
+    }
+    tab.addEventListener('pointerup', lepas);
+    tab.addEventListener('pointercancel', lepas);
+    tab.addEventListener('click', function (e) { if (e.detail === 0) ke(p > 0.5 ? 0 : 1, 1200); });
+    tab.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowRight') { e.preventDefault(); cancelAnimationFrame(raf); set(p + 0.1); }
+      if (e.key === 'ArrowLeft') { e.preventDefault(); cancelAnimationFrame(raf); set(p - 0.1); }
+    });
+
+    /* satu gerakan saat halaman dibuka: tab meluncur ke kanan dan membuka ritsleting */
+    setTimeout(function () { ke(1, 1600); }, 500);
+  })();
+
+  render();
+})();
+</script>
+</body>
+</html>
